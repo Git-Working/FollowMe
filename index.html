@@ -1,0 +1,1718 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#090d16" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Raum-Tracking" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2338bdf8'><circle cx='12' cy='12' r='10' fill='%230f172a'/><path d='M12 3a9 9 0 0 0-9 9c0 2.4.9 4.6 2.4 6.2l1.4-1.4A6.9 6.9 0 0 1 5 12a7 7 0 1 1 14 0c0 1.9-.8 3.7-2.1 5l1.4 1.4A8.9 8.9 0 0 0 21 12a9 9 0 0 0-9-9zm0 4a5 5 0 0 0-5 5c0 1.4.6 2.6 1.5 3.5l1.4-1.4A3 3 0 0 1 9 12a3 3 0 1 1 6 0c0 .8-.3 1.6-.9 2.1l1.4 1.4A4.9 4.9 0 0 0 17 12a5 5 0 0 0-5-5zm0 3a2 2 0 1 0 0 4 2 2 0 0 0 0-4z' fill='%2338bdf8'/></svg>"
+    />
+    <link
+      rel="apple-touch-icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect width='180' height='180' rx='40' fill='%230f172a'/><circle cx='90' cy='90' r='50' fill='%232563eb'/><circle cx='90' cy='90' r='20' fill='%2338bdf8'/></svg>"
+    />
+
+    <title>Raum-Tracking Smart Home</title>
+    <style>
+      :root {
+        --bg-main: #090d16;
+        --bg-card: rgba(22, 30, 46, 0.75);
+        --bg-card-hover: rgba(30, 41, 64, 0.85);
+        --border-subtle: rgba(255, 255, 255, 0.08);
+        --border-accent: rgba(56, 189, 248, 0.35);
+        --text-primary: #f8fafc;
+        --text-secondary: #94a3b8;
+        --text-muted: #64748b;
+        --accent-blue: #38bdf8;
+        --accent-green: #10b981;
+        --accent-green-glow: rgba(16, 185, 129, 0.3);
+        --accent-orange: #f59e0b;
+        --accent-red: #ef4444;
+        --radius-lg: 20px;
+        --radius-md: 14px;
+        --radius-sm: 10px;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      body {
+        min-height: 100vh;
+        background: radial-gradient(circle at 50% 0%, #172554 0%, var(--bg-main) 70%);
+        background-color: var(--bg-main);
+        color: var(--text-primary);
+        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, system-ui, sans-serif;
+        line-height: 1.45;
+        padding: max(16px, env(safe-area-inset-top)) 16px max(28px, env(safe-area-inset-bottom)) 16px;
+        display: flex;
+        justify-content: center;
+        user-select: none;
+      }
+
+      .app-container {
+        width: 100%;
+        max-width: 440px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      /* Top App Bar */
+      .app-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 4px 4px;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .brand-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #0284c7, #2563eb);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+      }
+
+      .brand-icon svg {
+        width: 20px;
+        height: 20px;
+        fill: white;
+      }
+
+      .brand-title {
+        font-size: 1.15rem;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        background: linear-gradient(180deg, #ffffff 40%, #cbd5e1 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .ha-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        padding: 5px 10px;
+        border-radius: 999px;
+        background: rgba(15, 23, 42, 0.6);
+        border: 1px solid var(--border-subtle);
+        color: var(--text-secondary);
+      }
+
+      .status-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--text-muted);
+      }
+      .status-dot.online {
+        background: var(--accent-green);
+        box-shadow: 0 0 8px var(--accent-green);
+      }
+      .status-dot.warn {
+        background: var(--accent-orange);
+      }
+
+      /* Base Card Style */
+      .card {
+        background: var(--bg-card);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-lg);
+        padding: 18px;
+        box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.35);
+        transition: transform 0.2s ease, border-color 0.2s ease;
+      }
+
+      /* Hero Power Card */
+      .hero-card {
+        position: relative;
+        text-align: center;
+        padding: 24px 18px 20px;
+        overflow: hidden;
+      }
+
+      .hero-card::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle at 50% 30%, rgba(56, 189, 248, 0.08) 0%, transparent 60%);
+        pointer-events: none;
+        transition: opacity 0.4s ease;
+        opacity: 0;
+      }
+
+      .hero-card.active {
+        border-color: rgba(16, 185, 129, 0.4);
+      }
+      .hero-card.active::before {
+        background: radial-gradient(circle at 50% 30%, rgba(16, 185, 129, 0.15) 0%, transparent 65%);
+        opacity: 1;
+      }
+
+      /* Giant Radar Button */
+      .power-btn-wrap {
+        position: relative;
+        width: 140px;
+        height: 140px;
+        margin: 6px auto 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .radar-ring {
+        position: absolute;
+        inset: -12px;
+        border-radius: 50%;
+        border: 2px dashed rgba(56, 189, 248, 0.2);
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      .active .radar-ring {
+        opacity: 1;
+        animation: spinRadar 12s linear infinite;
+        border-color: rgba(16, 185, 129, 0.4);
+      }
+
+      .radar-pulse {
+        position: absolute;
+        inset: -6px;
+        border-radius: 50%;
+        background: var(--accent-green-glow);
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      .active .radar-pulse {
+        animation: pulseWave 2.2s cubic-bezier(0.24, 0, 0.38, 1) infinite;
+      }
+
+      @keyframes spinRadar {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+
+      @keyframes pulseWave {
+        0% { transform: scale(0.92); opacity: 0.8; }
+        70% { transform: scale(1.3); opacity: 0; }
+        100% { transform: scale(1.3); opacity: 0; }
+      }
+
+      .power-btn {
+        position: relative;
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        border: none;
+        outline: none;
+        cursor: pointer;
+        background: linear-gradient(145deg, #1e293b, #0f172a);
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.15);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+        z-index: 2;
+      }
+
+      .power-btn:active {
+        transform: scale(0.93);
+      }
+
+      .power-btn svg {
+        width: 44px;
+        height: 44px;
+        fill: var(--text-muted);
+        transition: all 0.3s ease;
+      }
+
+      .power-btn-label {
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        transition: color 0.3s ease;
+      }
+
+      .hero-card.active .power-btn {
+        background: linear-gradient(145deg, #059669, #047857);
+        box-shadow: 0 12px 30px -4px rgba(16, 185, 129, 0.5), inset 0 2px 2px rgba(255, 255, 255, 0.3);
+      }
+
+      .hero-card.active .power-btn svg {
+        fill: #ffffff;
+        filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.3));
+      }
+
+      .hero-card.active .power-btn-label {
+        color: #ffffff;
+      }
+
+      .hero-status-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin-bottom: 4px;
+      }
+
+      .hero-status-desc {
+        font-size: 0.88rem;
+        color: var(--text-secondary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+      }
+
+      /* Live Room Indicator Pill */
+      .current-room-pill {
+        margin-top: 14px;
+        padding: 10px 16px;
+        border-radius: var(--radius-md);
+        background: rgba(15, 23, 42, 0.6);
+        border: 1px solid var(--border-subtle);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .active .current-room-pill {
+        background: rgba(16, 185, 129, 0.1);
+        border-color: rgba(16, 185, 129, 0.3);
+      }
+
+      .room-label-group {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        text-align: left;
+      }
+
+      .room-icon-badge {
+        font-size: 1.3rem;
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.05);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .room-name-text {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--text-primary);
+      }
+
+      .room-sub-text {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+      }
+
+      .rssi-badge {
+        font-size: 0.75rem;
+        font-weight: 600;
+        font-family: ui-monospace, SFMono-Regular, monospace;
+        padding: 4px 8px;
+        border-radius: 6px;
+        background: rgba(0, 0, 0, 0.3);
+        color: var(--accent-blue);
+      }
+
+      /* Section Headers */
+      .section-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 12px;
+      }
+
+      .section-title {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .section-title svg {
+        width: 16px;
+        height: 16px;
+        fill: var(--text-muted);
+      }
+
+      /* Modern iOS-Style Form Controls */
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .input-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+      }
+
+      .text-input, .select-input {
+        width: 100%;
+        background: rgba(15, 23, 42, 0.6);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-sm);
+        padding: 12px 14px;
+        font-size: 0.95rem;
+        color: var(--text-primary);
+        outline: none;
+        transition: border-color 0.2s ease, background 0.2s ease;
+      }
+
+      .text-input:focus, .select-input:focus {
+        border-color: var(--accent-blue);
+        background: rgba(15, 23, 42, 0.9);
+      }
+
+      .mac-input {
+        font-family: ui-monospace, SFMono-Regular, monospace;
+        letter-spacing: 0.05em;
+      }
+
+      /* Toggle Row */
+      .toggle-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 6px 0;
+        cursor: pointer;
+      }
+
+      .toggle-label {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        text-align: left;
+        flex: 1;
+        padding-right: 12px;
+      }
+
+      .toggle-title {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--text-primary);
+      }
+
+      .toggle-desc {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+      }
+
+      /* iOS Switch Style */
+      .switch {
+        position: relative;
+        display: inline-block;
+        width: 50px;
+        height: 30px;
+        flex-shrink: 0;
+      }
+
+      .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+
+      .slider {
+        position: absolute;
+        cursor: pointer;
+        inset: 0;
+        background-color: #334155;
+        transition: 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+        border-radius: 34px;
+      }
+
+      .slider:before {
+        position: absolute;
+        content: "";
+        height: 24px;
+        width: 24px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+        border-radius: 50%;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      input:checked + .slider {
+        background-color: var(--accent-green);
+      }
+
+      input:checked + .slider:before {
+        transform: translateX(20px);
+      }
+
+      /* Collapsible Sub-sections */
+      .expandable {
+        max-height: 0;
+        opacity: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease, opacity 0.3s ease;
+      }
+
+      .expandable.open {
+        max-height: 800px;
+        opacity: 1;
+      }
+
+      /* Guide Accordion */
+      .guide-btn {
+        background: transparent;
+        border: none;
+        color: var(--accent-blue);
+        font-size: 0.82rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        cursor: pointer;
+        padding: 4px 0;
+      }
+
+      .guide-box {
+        background: rgba(15, 23, 42, 0.7);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-sm);
+        padding: 12px;
+        margin-top: 8px;
+        font-size: 0.82rem;
+        color: var(--text-secondary);
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        line-height: 1.4;
+      }
+
+      .guide-box strong {
+        color: var(--text-primary);
+      }
+
+      /* Rooms Grid */
+      .rooms-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .room-tile {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 14px;
+        background: rgba(15, 23, 42, 0.55);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-md);
+        transition: all 0.2s ease;
+      }
+
+      .room-tile.is-occupied {
+        border-color: rgba(56, 189, 248, 0.45);
+        background: rgba(56, 189, 248, 0.08);
+      }
+
+      .room-tile.is-lit {
+        border-color: rgba(245, 158, 11, 0.45);
+      }
+
+      .room-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .room-glyph {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.04);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+      }
+
+      .room-tile.is-lit .room-glyph {
+        background: rgba(245, 158, 11, 0.2);
+        filter: drop-shadow(0 0 8px rgba(245, 158, 11, 0.5));
+      }
+
+      .room-details {
+        text-align: left;
+      }
+
+      .room-name {
+        font-weight: 600;
+        font-size: 0.95rem;
+      }
+
+      .room-signal-bar {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.75rem;
+        color: var(--text-muted);
+      }
+
+      .sig-meter {
+        display: flex;
+        align-items: flex-end;
+        gap: 2px;
+        height: 12px;
+      }
+
+      .sig-bar {
+        width: 3px;
+        background: #334155;
+        border-radius: 1px;
+      }
+      .sig-bar:nth-child(1) { height: 4px; }
+      .sig-bar:nth-child(2) { height: 7px; }
+      .sig-bar:nth-child(3) { height: 10px; }
+      .sig-bar:nth-child(4) { height: 13px; }
+
+      .sig-good .sig-bar { background: var(--accent-green); }
+      .sig-med .sig-bar:nth-child(-n+3) { background: var(--accent-orange); }
+      .sig-low .sig-bar:nth-child(-n+2) { background: var(--accent-red); }
+
+      /* Action buttons for room lights */
+      .light-toggle-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 12px;
+        border-radius: 10px;
+        border: 1px solid var(--border-subtle);
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--text-secondary);
+        font-size: 0.8rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .light-toggle-btn:active {
+        transform: scale(0.95);
+      }
+
+      .room-tile.is-lit .light-toggle-btn {
+        background: rgba(245, 158, 11, 0.2);
+        border-color: rgba(245, 158, 11, 0.5);
+        color: #fbbf24;
+      }
+
+      /* Calibration Tile */
+      .cal-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 12px;
+        background: rgba(15, 23, 42, 0.5);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-sm);
+        margin-bottom: 8px;
+      }
+
+      .cal-controls {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .cal-btn {
+        width: 28px;
+        height: 28px;
+        border-radius: 6px;
+        border: 1px solid var(--border-subtle);
+        background: rgba(255, 255, 255, 0.08);
+        color: var(--text-primary);
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+      }
+      .cal-btn:active { transform: scale(0.92); }
+
+      .cal-val {
+        font-family: ui-monospace, monospace;
+        font-size: 0.82rem;
+        min-width: 48px;
+        text-align: center;
+      }
+
+      .cal-snap-btn {
+        padding: 5px 9px;
+        border-radius: 6px;
+        border: 1px solid var(--border-accent);
+        background: rgba(56, 189, 248, 0.1);
+        color: var(--accent-blue);
+        font-size: 0.75rem;
+        font-weight: 600;
+        cursor: pointer;
+      }
+      .cal-snap-btn:active { transform: scale(0.95); }
+
+      /* Webhook Link Box */
+      .webhook-box {
+        background: rgba(15, 23, 42, 0.7);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-sm);
+        padding: 10px;
+        margin-top: 8px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .webhook-url-input {
+        font-family: ui-monospace, monospace;
+        font-size: 0.72rem;
+        background: rgba(0, 0, 0, 0.4);
+        border: 1px solid var(--border-subtle);
+        color: var(--accent-blue);
+        padding: 8px;
+        border-radius: 6px;
+        width: 100%;
+        outline: none;
+      }
+
+      /* Quick Actions Buttons */
+      .action-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+
+      .action-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 13px;
+        border-radius: var(--radius-sm);
+        border: 1px solid var(--border-subtle);
+        background: rgba(15, 23, 42, 0.6);
+        color: var(--text-primary);
+        font-size: 0.88rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .action-btn:active {
+        transform: scale(0.97);
+        background: rgba(30, 41, 64, 0.9);
+      }
+
+      /* Feed List */
+      .feed-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        max-height: 200px;
+        overflow-y: auto;
+      }
+
+      .feed-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 10px;
+        border-radius: 8px;
+        background: rgba(15, 23, 42, 0.4);
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+      }
+
+      .feed-icon { flex-shrink: 0; font-size: 1rem; }
+      .feed-text { flex: 1; text-align: left; }
+      .feed-time { font-size: 0.72rem; color: var(--text-muted); font-family: ui-monospace, monospace; }
+
+      /* Error Toast */
+      .error-toast {
+        display: none;
+        background: rgba(239, 68, 68, 0.15);
+        border: 1px solid rgba(239, 68, 68, 0.4);
+        color: #fca5a5;
+        border-radius: var(--radius-sm);
+        padding: 10px 14px;
+        font-size: 0.85rem;
+        text-align: left;
+      }
+      .error-toast.show { display: block; }
+    </style>
+  </head>
+  <body>
+    <div class="app-container">
+      <!-- Header Bar -->
+      <header class="app-bar">
+        <div class="brand">
+          <div class="brand-icon">
+            <svg viewBox="0 0 24 24">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm0 10c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z"/>
+            </svg>
+          </div>
+          <span class="brand-title">Raum-Tracking</span>
+        </div>
+        <div class="ha-pill" id="haPill">
+          <span class="status-dot" id="haDot"></span>
+          <span id="haText">Verbunden</span>
+        </div>
+      </header>
+
+      <!-- Hero Power / Radar Controller -->
+      <section class="card hero-card" id="heroCard">
+        <div class="power-btn-wrap">
+          <div class="radar-ring"></div>
+          <div class="radar-pulse"></div>
+          <button class="power-btn" id="powerBtn" type="button" aria-label="Tracking umschalten">
+            <svg viewBox="0 0 24 24">
+              <path d="M13 3h-2v10h2V3zm4.83 2.17l-1.42 1.42A7.92 7.92 0 0 1 20 12c0 4.42-3.58 8-8 8s-8-3.58-8-8c0-2.45 1.1-4.64 2.85-6.13l-1.42-1.42A9.92 9.92 0 0 0 2 12c0 5.52 4.48 10 10 10s10-4.48 10-10c0-2.76-1.12-5.26-2.93-7.07l-.24-.76z"/>
+            </svg>
+            <span class="power-btn-label" id="powerBtnLabel">START</span>
+          </button>
+        </div>
+
+        <h2 class="hero-status-title" id="heroStatusTitle">Tracking Inaktiv</h2>
+        <p class="hero-status-desc" id="heroStatusDesc">
+          Tippe auf den Button, um die Raum-Erkennung zu starten
+        </p>
+
+        <!-- Current Detected Room Banner -->
+        <div class="current-room-pill" id="roomPill">
+          <div class="room-label-group">
+            <div class="room-icon-badge" id="currentRoomIcon">🏠</div>
+            <div>
+              <div class="room-name-text" id="currentRoomName">Kein Raum erkannt</div>
+              <div class="room-sub-text" id="currentRoomStatus">Warte auf Signal...</div>
+            </div>
+          </div>
+          <span class="rssi-badge" id="currentRssiBadge">-- dBm</span>
+        </div>
+      </section>
+
+      <!-- Error Toast -->
+      <div class="error-toast" id="errorToast"></div>
+
+      <!-- Settings & Follow Options -->
+      <section class="card">
+        <div class="section-header">
+          <div class="section-title">
+            <svg viewBox="0 0 24 24">
+              <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.488.488 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
+            </svg>
+            <span>Einstellungen</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <!-- Nickname -->
+          <div class="input-wrapper">
+            <input
+              id="nameInput"
+              class="text-input"
+              type="text"
+              maxlength="40"
+              placeholder="Dein Name (z.B. Alex)"
+              autocomplete="nickname"
+            />
+          </div>
+
+          <!-- Follow Me Toggle -->
+          <label class="toggle-row" for="followToggle">
+            <div class="toggle-label">
+              <span class="toggle-title">Licht folgt mir</span>
+              <span class="toggle-desc">Schaltet Licht automatisch im aktiven Raum an</span>
+            </div>
+            <div class="switch">
+              <input id="followToggle" type="checkbox" />
+              <span class="slider"></span>
+            </div>
+          </label>
+
+          <!-- MAC Configuration (Expandable) -->
+          <div class="expandable" id="macExpandable">
+            <div style="padding-top: 4px;">
+              <div class="input-wrapper">
+                <input
+                  id="macInput"
+                  class="text-input mac-input"
+                  type="text"
+                  inputmode="text"
+                  autocapitalize="characters"
+                  autocomplete="off"
+                  spellcheck="false"
+                  placeholder="AA:BB:CC:DD:EE:FF"
+                  maxlength="17"
+                />
+              </div>
+
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px;">
+                <button type="button" class="guide-btn" id="guideToggleBtn">
+                  <span>ℹ️ Wo finde ich meine Handy-MAC?</span>
+                </button>
+              </div>
+
+              <div class="guide-box expandable" id="guideBox">
+                <div>
+                  <strong>🍏 iPhone (iOS):</strong><br />
+                  Einstellungen → WLAN → das (i) neben deinem Netzwerk → <em>„Private WLAN-Adresse“</em> ausschalten. Kopiere die angezeigte „WLAN-Adresse“.
+                </div>
+                <div>
+                  <strong>🤖 Android:</strong><br />
+                  Einstellungen → WLAN → Zahnrad deines Netzwerks → Erweitert/Datenschutz → auf <em>„Geräte-MAC verwenden“</em> stellen und MAC ablesen.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Wake Lock Toggle -->
+          <label class="toggle-row" for="wakeLockToggle">
+            <div class="toggle-label">
+              <span class="toggle-title">Display wachhalten</span>
+              <span class="toggle-desc">Verhindert Standby-Modus auf dem Smartphone</span>
+            </div>
+            <div class="switch">
+              <input id="wakeLockToggle" type="checkbox" />
+              <span class="slider"></span>
+            </div>
+          </label>
+        </div>
+      </section>
+
+      <!-- 2.4: Pfad-Beleuchtung (Flur-Licht mitnehmen mit Werteingabe) -->
+      <section class="card">
+        <div class="section-header">
+          <div class="section-title">
+            <span>🚶 Pfad-Beleuchtung (Flur)</span>
+          </div>
+          <label class="switch">
+            <input id="pathToggle" type="checkbox" />
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px;">
+          Hält beim Raumwechsel automatisch das Flur-Licht für eine eingestellte Zeit eingeschaltet.
+        </p>
+
+        <div class="expandable" id="pathExpandable">
+          <div class="form-group" style="padding-top: 4px;">
+            <div>
+              <label style="font-size: 0.78rem; color: var(--text-secondary); display: block; margin-bottom: 4px;">
+                Welcher Raum ist dein Flur?
+              </label>
+              <select id="pathRoomSelect" class="select-input"></select>
+            </div>
+
+            <div>
+              <label style="font-size: 0.78rem; color: var(--text-secondary); display: block; margin-bottom: 4px;">
+                Nachlaufzeit Flur-Licht (Sekunden):
+              </label>
+              <input
+                id="pathDurationInput"
+                class="text-input"
+                type="number"
+                min="5"
+                max="300"
+                step="5"
+                value="30"
+              />
+            </div>
+
+            <button class="action-btn" id="savePathBtn" type="button" style="margin-top: 4px;">
+              <span>💾 Einstellungen speichern</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 1.3: Raum-Signal Kalibrierungs-Assistent -->
+      <section class="card">
+        <div class="section-header">
+          <div class="section-title">
+            <svg viewBox="0 0 24 24">
+              <path d="M12 3a9 9 0 0 0-9 9c0 2.4.9 4.6 2.4 6.2l1.4-1.4A6.9 6.9 0 0 1 5 12a7 7 0 1 1 14 0c0 1.9-.8 3.7-2.1 5l1.4 1.4A8.9 8.9 0 0 0 21 12a9 9 0 0 0-9-9z"/>
+            </svg>
+            <span>Signal-Kalibrierung (1.3)</span>
+          </div>
+          <button type="button" class="guide-btn" id="calToggleBtn">
+            <span id="calToggleText">Öffnen ▼</span>
+          </button>
+        </div>
+
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">
+          Gleiche Signalunterschiede durch Wände oder Entfernungen für jeden Raum manuell oder per Knopfdruck ab.
+        </p>
+
+        <div class="expandable" id="calExpandable">
+          <div id="calibrationContainer" style="padding-top: 8px;">
+            <div style="text-align: center; color: var(--text-muted); font-size: 0.8rem;">Lade Kalibrierung...</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 1.1: Webhook für iOS Kurzbefehle & Android Routinen -->
+      <section class="card">
+        <div class="section-header">
+          <div class="section-title">
+            <span>⚡ iOS & Android Webhooks (1.1)</span>
+          </div>
+          <button type="button" class="guide-btn" id="webhookToggleBtn">
+            <span id="webhookToggleText">Anzeigen ▼</span>
+          </button>
+        </div>
+
+        <div class="expandable" id="webhookExpandable">
+          <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 8px;">
+            Nutze diese URLs in den <strong>iOS Kurzbefehlen</strong> oder einer Android-Automations-App (Tasker/Macrodroid), um das Tracking automatisch zu starten, sobald du dich mit deinem WLAN verbindest!
+          </p>
+
+          <div class="webhook-box">
+            <span style="font-size: 0.75rem; font-weight: 600; color: var(--accent-green);">Start-URL (WLAN verbunden):</span>
+            <input id="startWebhookUrl" class="webhook-url-input" readonly type="text" />
+            <button class="action-btn" id="copyStartUrlBtn" type="button" style="padding: 8px; font-size: 0.8rem;">
+              <span>📋 Start-URL kopieren</span>
+            </button>
+          </div>
+
+          <div class="webhook-box">
+            <span style="font-size: 0.75rem; font-weight: 600; color: var(--accent-red);">Stop-URL (WLAN getrennt):</span>
+            <input id="stopWebhookUrl" class="webhook-url-input" readonly type="text" />
+            <button class="action-btn" id="copyStopUrlBtn" type="button" style="padding: 8px; font-size: 0.8rem;">
+              <span>📋 Stop-URL kopieren</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Rooms Live Overview -->
+      <section class="card">
+        <div class="section-header">
+          <div class="section-title">
+            <svg viewBox="0 0 24 24">
+              <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+            </svg>
+            <span>Räume & Beleuchtung</span>
+          </div>
+          <span style="font-size: 0.75rem; color: var(--text-muted);" id="userCountBadge">0 aktiv</span>
+        </div>
+
+        <div class="rooms-grid" id="roomsContainer">
+          <div style="text-align: center; color: var(--text-muted); font-size: 0.85rem; padding: 12px;">
+            Lade Räume...
+          </div>
+        </div>
+      </section>
+
+      <!-- Quick Test Actions -->
+      <section class="card">
+        <div class="section-header">
+          <div class="section-title">
+            <svg viewBox="0 0 24 24">
+              <path d="M7 2v11h3v9l7-12h-4l4-8z"/>
+            </svg>
+            <span>Schnellaktionen</span>
+          </div>
+        </div>
+
+        <div class="action-grid">
+          <button class="action-btn" id="clapTestBtn" type="button">
+            <span>👏</span>
+            <span>Doppelklatsch-Test (3.1)</span>
+          </button>
+          <button class="action-btn" id="refreshBtn" type="button">
+            <span>🔄</span>
+            <span>Aktualisieren</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Activity Timeline -->
+      <section class="card">
+        <div class="section-header">
+          <div class="section-title">
+            <svg viewBox="0 0 24 24">
+              <path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/>
+            </svg>
+            <span>Aktivitäts-Feed</span>
+          </div>
+        </div>
+        <div class="feed-list" id="feedList">
+          <div style="text-align: center; color: var(--text-muted); font-size: 0.8rem; padding: 10px;">
+            Noch keine Ereignisse
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <script>
+      // App State
+      let active = false;
+      let timer = null;
+      let wakeLock = null;
+      let currentRoom = null;
+      let knownRooms = [];
+      let litRooms = [];
+      let roomSignals = {};
+      let calibrations = {};
+      let pathSettings = { enabled: false, hallwayRoom: '', durationSec: 30 };
+
+      const HEARTBEAT_ACTIVE_MS = 3000;
+      const HEARTBEAT_IDLE_MS = 10000;
+      const MAC_PATTERN = /^([0-9a-f]{2}[:-]){5}[0-9a-f]{2}$/i;
+
+      // DOM Elements
+      const heroCard = document.getElementById('heroCard');
+      const powerBtn = document.getElementById('powerBtn');
+      const powerBtnLabel = document.getElementById('powerBtnLabel');
+      const heroStatusTitle = document.getElementById('heroStatusTitle');
+      const heroStatusDesc = document.getElementById('heroStatusDesc');
+      const currentRoomIcon = document.getElementById('currentRoomIcon');
+      const currentRoomName = document.getElementById('currentRoomName');
+      const currentRoomStatus = document.getElementById('currentRoomStatus');
+      const currentRssiBadge = document.getElementById('currentRssiBadge');
+      const errorToast = document.getElementById('errorToast');
+      const nameInput = document.getElementById('nameInput');
+      const followToggle = document.getElementById('followToggle');
+      const macExpandable = document.getElementById('macExpandable');
+      const macInput = document.getElementById('macInput');
+      const guideToggleBtn = document.getElementById('guideToggleBtn');
+      const guideBox = document.getElementById('guideBox');
+      const wakeLockToggle = document.getElementById('wakeLockToggle');
+      const roomsContainer = document.getElementById('roomsContainer');
+      const userCountBadge = document.getElementById('userCountBadge');
+      const clapTestBtn = document.getElementById('clapTestBtn');
+      const refreshBtn = document.getElementById('refreshBtn');
+      const feedList = document.getElementById('feedList');
+      const haDot = document.getElementById('haDot');
+      const haText = document.getElementById('haText');
+
+      // 2.4 Path Lighting DOM
+      const pathToggle = document.getElementById('pathToggle');
+      const pathExpandable = document.getElementById('pathExpandable');
+      const pathRoomSelect = document.getElementById('pathRoomSelect');
+      const pathDurationInput = document.getElementById('pathDurationInput');
+      const savePathBtn = document.getElementById('savePathBtn');
+
+      // 1.3 Calibration DOM
+      const calToggleBtn = document.getElementById('calToggleBtn');
+      const calToggleText = document.getElementById('calToggleText');
+      const calExpandable = document.getElementById('calExpandable');
+      const calibrationContainer = document.getElementById('calibrationContainer');
+
+      // 1.1 Webhook DOM
+      const webhookToggleBtn = document.getElementById('webhookToggleBtn');
+      const webhookToggleText = document.getElementById('webhookToggleText');
+      const webhookExpandable = document.getElementById('webhookExpandable');
+      const startWebhookUrl = document.getElementById('startWebhookUrl');
+      const stopWebhookUrl = document.getElementById('stopWebhookUrl');
+      const copyStartUrlBtn = document.getElementById('copyStartUrlBtn');
+      const copyStopUrlBtn = document.getElementById('copyStopUrlBtn');
+
+      // LocalStorage Helper
+      function store(k, v) { try { localStorage.setItem(k, v); } catch (_) {} }
+      function load(k) { try { return localStorage.getItem(k); } catch (_) { return null; } }
+
+      // Unique Tracker ID
+      let trackerId = load('rt_trackerId');
+      if (!trackerId) {
+        trackerId = crypto.randomUUID();
+        store('rt_trackerId', trackerId);
+      }
+
+      // Restore stored settings
+      nameInput.value = load('rt_name') || '';
+      macInput.value = load('rt_mac') || '';
+      followToggle.checked = load('rt_follow') === '1';
+      wakeLockToggle.checked = load('rt_wakeLock') === '1';
+
+      // Haptic feedback helper
+      function haptic(ms = 15) {
+        if (navigator.vibrate) {
+          try { navigator.vibrate(ms); } catch (_) {}
+        }
+      }
+
+      // MAC Input Auto-Formatter
+      macInput.addEventListener('input', (e) => {
+        let val = e.target.value.replace(/[^0-9a-fA-F]/g, '').toUpperCase();
+        if (val.length > 12) val = val.slice(0, 12);
+        const parts = [];
+        for (let i = 0; i < val.length; i += 2) {
+          parts.push(val.slice(i, i + 2));
+        }
+        e.target.value = parts.join(':');
+        updateWebhookUrls();
+      });
+
+      nameInput.addEventListener('input', updateWebhookUrls);
+
+      // Update Webhook URLs
+      function updateWebhookUrls() {
+        const host = window.location.host;
+        const mac = macInput.value.trim();
+        const name = encodeURIComponent(nameInput.value.trim() || 'Handy');
+        startWebhookUrl.value = `http://${host}/api/action/start?mac=${mac}&name=${name}`;
+        stopWebhookUrl.value = `http://${host}/api/action/stop?mac=${mac}`;
+      }
+      updateWebhookUrls();
+
+      // Copy Helper
+      async function copyText(inputElem, btnElem) {
+        haptic(20);
+        try {
+          await navigator.clipboard.writeText(inputElem.value);
+          const orig = btnElem.innerHTML;
+          btnElem.innerHTML = '<span>✅ Kopiert!</span>';
+          setTimeout(() => { btnElem.innerHTML = orig; }, 1800);
+        } catch (_) {
+          inputElem.select();
+          document.execCommand('copy');
+        }
+      }
+      copyStartUrlBtn.addEventListener('click', () => copyText(startWebhookUrl, copyStartUrlBtn));
+      copyStopUrlBtn.addEventListener('click', () => copyText(stopWebhookUrl, copyStopUrlBtn));
+
+      // Guide Toggle
+      guideToggleBtn.addEventListener('click', () => {
+        guideBox.classList.toggle('open');
+      });
+
+      // Calibration Accordion Toggle
+      calToggleBtn.addEventListener('click', () => {
+        const isOpen = calExpandable.classList.toggle('open');
+        calToggleText.textContent = isOpen ? 'Schließen ▲' : 'Öffnen ▼';
+      });
+
+      // Webhook Accordion Toggle
+      webhookToggleBtn.addEventListener('click', () => {
+        const isOpen = webhookExpandable.classList.toggle('open');
+        webhookToggleText.textContent = isOpen ? 'Schließen ▲' : 'Anzeigen ▼';
+      });
+
+      // Wake Lock API Management
+      async function requestWakeLock() {
+        if ('wakeLock' in navigator && wakeLockToggle.checked) {
+          try {
+            wakeLock = await navigator.wakeLock.request('screen');
+            wakeLock.addEventListener('release', () => { wakeLock = null; });
+          } catch (err) {
+            console.warn('WakeLock not granted:', err.message);
+          }
+        }
+      }
+
+      function releaseWakeLock() {
+        if (wakeLock) {
+          wakeLock.release().catch(() => {});
+          wakeLock = null;
+        }
+      }
+
+      wakeLockToggle.addEventListener('change', () => {
+        store('rt_wakeLock', wakeLockToggle.checked ? '1' : '0');
+        if (wakeLockToggle.checked && active) {
+          requestWakeLock();
+        } else {
+          releaseWakeLock();
+        }
+      });
+
+      // 2.4: Path Lighting Options Handler
+      pathToggle.addEventListener('change', () => {
+        pathExpandable.classList.toggle('open', pathToggle.checked);
+      });
+
+      savePathBtn.addEventListener('click', async () => {
+        haptic(25);
+        const payload = {
+          enabled: pathToggle.checked,
+          hallwayRoom: pathRoomSelect.value,
+          durationSec: Number(pathDurationInput.value) || 30,
+        };
+        try {
+          const res = await fetch('/api/settings', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ pathLighting: payload }),
+          });
+          if (res.ok) {
+            const data = await res.json();
+            pathSettings = data.pathLighting || payload;
+            showError('');
+            savePathBtn.innerHTML = '<span>✅ Gespeichert!</span>';
+            setTimeout(() => { savePathBtn.innerHTML = '<span>💾 Einstellungen speichern</span>'; }, 1500);
+          }
+        } catch (e) {
+          showError(`Fehler beim Speichern der Pfad-Beleuchtung: ${e.message}`);
+        }
+      });
+
+      // Room Icon Matcher
+      function getRoomIcon(roomId) {
+        const id = (roomId || '').toLowerCase();
+        if (id.includes('wohn') || id.includes('living')) return '🛋️';
+        if (id.includes('kueche') || id.includes('küche') || id.includes('kitchen')) return '🍳';
+        if (id.includes('schlaf') || id.includes('bed')) return '🛏️';
+        if (id.includes('bad') || id.includes('bath')) return '🚿';
+        if (id.includes('buero') || id.includes('büro') || id.includes('office')) return '💻';
+        if (id.includes('flur') || id.includes('hall') || id.includes('diele')) return '🚪';
+        if (id.includes('balkon') || id.includes('garten')) return '🌿';
+        return '🏠';
+      }
+
+      function formatRoomTitle(roomId) {
+        if (!roomId) return 'Unbekannt';
+        return roomId.charAt(0).toUpperCase() + roomId.slice(1);
+      }
+
+      // Render UI
+      function render() {
+        heroCard.classList.toggle('active', active);
+        powerBtnLabel.textContent = active ? 'STOP' : 'START';
+        macExpandable.classList.toggle('open', followToggle.checked);
+
+        nameInput.disabled = active;
+        followToggle.disabled = active;
+        macInput.disabled = active;
+
+        if (!active) {
+          heroStatusTitle.textContent = 'Tracking Inaktiv';
+          heroStatusDesc.textContent = 'Tippe auf START, um Präsenzerkennung zu aktivieren';
+          currentRoomIcon.textContent = '🏠';
+          currentRoomName.textContent = 'Inaktiv';
+          currentRoomStatus.textContent = 'Tracking ist pausiert';
+          currentRssiBadge.textContent = '-- dBm';
+        } else {
+          heroStatusTitle.textContent = 'Tracking Aktiv';
+          if (followToggle.checked) {
+            if (currentRoom) {
+              heroStatusDesc.textContent = `Erkannt im ${formatRoomTitle(currentRoom)}`;
+              currentRoomIcon.textContent = getRoomIcon(currentRoom);
+              currentRoomName.textContent = formatRoomTitle(currentRoom);
+              currentRoomStatus.textContent = 'Licht folgt deiner Präsenz';
+
+              const sig = roomSignals[currentRoom];
+              if (sig && Number.isFinite(sig.effectiveRssi || sig.rssi)) {
+                currentRssiBadge.textContent = `${sig.effectiveRssi || sig.rssi} dBm`;
+              } else {
+                currentRssiBadge.textContent = 'Aktiv';
+              }
+            } else {
+              heroStatusDesc.textContent = 'Scanne ESP32 Beacons & Wi-Fi...';
+              currentRoomIcon.textContent = '🔍';
+              currentRoomName.textContent = 'Suche Raum...';
+              currentRoomStatus.textContent = 'Warte auf BLE / Wi-Fi Signal';
+              currentRssiBadge.textContent = '-- dBm';
+            }
+          } else {
+            heroStatusDesc.textContent = 'Präsenz aktiviert (ohne Licht-Folgen)';
+            currentRoomIcon.textContent = '📍';
+            currentRoomName.textContent = 'Anwesend';
+            currentRoomStatus.textContent = 'Tracking aktiv';
+            currentRssiBadge.textContent = 'OK';
+          }
+        }
+
+        renderRoomsList();
+        renderCalibrationList();
+        populatePathRoomSelect();
+      }
+
+      // Populate Path Hallway Select
+      function populatePathRoomSelect() {
+        if (!knownRooms || knownRooms.length === 0) return;
+        const currentSelected = pathRoomSelect.value || pathSettings.hallwayRoom;
+        pathRoomSelect.innerHTML = knownRooms.map(r => `
+          <option value="${r}" ${r === currentSelected ? 'selected' : ''}>
+            ${getRoomIcon(r)} ${formatRoomTitle(r)}
+          </option>
+        `).join('');
+      }
+
+      // Render Rooms & Signals
+      function renderRoomsList() {
+        if (!knownRooms || knownRooms.length === 0) {
+          roomsContainer.innerHTML = '<div style="text-align: center; color: var(--text-muted); font-size: 0.85rem; padding: 12px;">Keine Räume konfiguriert</div>';
+          return;
+        }
+
+        roomsContainer.innerHTML = knownRooms.map((room) => {
+          const isOccupied = active && currentRoom === room;
+          const isLit = litRooms.includes(room);
+          const sig = roomSignals[room];
+          const rssi = sig ? (sig.effectiveRssi || sig.rssi) : null;
+
+          let sigClass = '';
+          let sigText = 'Kein Signal';
+          if (rssi !== null) {
+            sigText = `${rssi} dBm`;
+            if (rssi >= -65) sigClass = 'sig-good';
+            else if (rssi >= -80) sigClass = 'sig-med';
+            else sigClass = 'sig-low';
+          }
+
+          return `
+            <div class="room-tile ${isOccupied ? 'is-occupied' : ''} ${isLit ? 'is-lit' : ''}">
+              <div class="room-info">
+                <div class="room-glyph">${getRoomIcon(room)}</div>
+                <div class="room-details">
+                  <div class="room-name">${formatRoomTitle(room)}</div>
+                  <div class="room-signal-bar ${sigClass}">
+                    <div class="sig-meter">
+                      <div class="sig-bar"></div>
+                      <div class="sig-bar"></div>
+                      <div class="sig-bar"></div>
+                      <div class="sig-bar"></div>
+                    </div>
+                    <span>${sigText}</span>
+                  </div>
+                </div>
+              </div>
+
+              <button class="light-toggle-btn" type="button" onclick="toggleRoomLight('${room}')">
+                <span>${isLit ? '💡 AN' : '⚪ AUS'}</span>
+              </button>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // 1.3: Render Calibration List
+      function renderCalibrationList() {
+        if (!knownRooms || knownRooms.length === 0) return;
+        calibrationContainer.innerHTML = knownRooms.map((room) => {
+          const offset = calibrations[room] || 0;
+          const sig = roomSignals[room];
+          const rawRssi = sig ? sig.rssi : null;
+
+          return `
+            <div class="cal-row">
+              <div>
+                <strong style="font-size: 0.88rem;">${getRoomIcon(room)} ${formatRoomTitle(room)}</strong>
+                <div style="font-size: 0.72rem; color: var(--text-muted);">
+                  Signal: ${rawRssi !== null ? `${rawRssi} dBm` : 'Kein Signal'}
+                </div>
+              </div>
+
+              <div class="cal-controls">
+                <button class="cal-btn" onclick="adjustCalibration('${room}', -1)">-</button>
+                <span class="cal-val">${offset > 0 ? '+' : ''}${offset} dB</span>
+                <button class="cal-btn" onclick="adjustCalibration('${room}', 1)">+</button>
+                <button class="cal-snap-btn" onclick="snapCalibration('${room}')">Einmessen</button>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // Adjust calibration offset
+      window.adjustCalibration = async function(room, delta) {
+        haptic(15);
+        const current = calibrations[room] || 0;
+        const newOffset = current + delta;
+        calibrations[room] = newOffset;
+        renderCalibrationList();
+
+        try {
+          await fetch('/api/calibration', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ room, offset: newOffset }),
+          });
+        } catch (_) {}
+      };
+
+      // Snap / Auto-Calibrate Room Baseline
+      window.snapCalibration = async function(room) {
+        haptic(30);
+        const sig = roomSignals[room];
+        if (!sig || !Number.isFinite(sig.rssi)) {
+          showError(`Kann ${room} nicht einmessen: Noch kein Signal empfangen.`);
+          return;
+        }
+        // Normalize against typical target -60 dBm
+        const target = -60;
+        const recommendedOffset = target - sig.rssi;
+        calibrations[room] = Math.max(-25, Math.min(25, recommendedOffset));
+        renderCalibrationList();
+
+        try {
+          await fetch('/api/calibration', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ room, offset: calibrations[room] }),
+          });
+          showError('');
+        } catch (_) {}
+      };
+
+      // Render Activity Feed
+      function renderFeed(logs) {
+        if (!logs || logs.length === 0) return;
+        feedList.innerHTML = logs.map((item) => {
+          let icon = 'ℹ️';
+          if (item.type === 'light') icon = '💡';
+          else if (item.type === 'presence') icon = '📍';
+          else if (item.type === 'clap') icon = '👏';
+          else if (item.type === 'webhook') icon = '⚡';
+          else if (item.type === 'error') icon = '⚠️';
+
+          return `
+            <div class="feed-item">
+              <span class="feed-icon">${icon}</span>
+              <span class="feed-text">${item.message}</span>
+              <span class="feed-time">${item.time}</span>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // Send Presence Heartbeat
+      async function sendPresence(isActive) {
+        const payload = {
+          id: trackerId,
+          name: nameInput.value.trim() || 'Mein Smartphone',
+          active: isActive,
+          follow: followToggle.checked,
+          mac: macInput.value.trim(),
+        };
+
+        const res = await fetch('/api/presence', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.error || `Server Fehler (${res.status})`);
+        }
+        return await res.json();
+      }
+
+      // Polling Loop
+      async function heartbeat() {
+        try {
+          const data = await sendPresence(true);
+          currentRoom = data.room || null;
+          litRooms = data.litRooms || [];
+          roomSignals = data.signals || {};
+          if (Array.isArray(data.rooms)) knownRooms = data.rooms;
+          if (data.calibration) calibrations = data.calibration;
+          if (data.users !== undefined) userCountBadge.textContent = `${data.users} aktiv`;
+
+          haDot.className = data.haConfigured ? 'status-dot online' : 'status-dot warn';
+          haText.textContent = data.haConfigured ? 'HA Verbunden' : 'HA Offline';
+
+          if (data.recentLogs) renderFeed(data.recentLogs);
+          showError('');
+          render();
+        } catch (err) {
+          haDot.className = 'status-dot warn';
+          haText.textContent = 'Verbindung...';
+          console.warn('Heartbeat error:', err.message);
+        }
+
+        if (active) {
+          timer = setTimeout(heartbeat, followToggle.checked ? HEARTBEAT_ACTIVE_MS : HEARTBEAT_IDLE_MS);
+        }
+      }
+
+      // Start Tracking
+      async function startTracking() {
+        showError('');
+        haptic(25);
+
+        if (followToggle.checked) {
+          const mac = macInput.value.trim();
+          if (!MAC_PATTERN.test(mac)) {
+            showError('Bitte eine gültige WLAN-MAC-Adresse angeben (z.B. AA:BB:CC:DD:EE:FF).');
+            return;
+          }
+        }
+
+        try {
+          const data = await sendPresence(true);
+          currentRoom = data.room || null;
+          litRooms = data.litRooms || [];
+          roomSignals = data.signals || {};
+          if (Array.isArray(data.rooms)) knownRooms = data.rooms;
+          if (data.calibration) calibrations = data.calibration;
+        } catch (err) {
+          showError(err.message === 'Failed to fetch' ? 'Server nicht erreichbar. Läuft der Node-Server?' : err.message);
+          return;
+        }
+
+        // Save preferences
+        store('rt_name', nameInput.value.trim());
+        store('rt_mac', macInput.value.trim());
+        store('rt_follow', followToggle.checked ? '1' : '0');
+
+        active = true;
+        if (wakeLockToggle.checked) requestWakeLock();
+
+        render();
+        timer = setTimeout(heartbeat, followToggle.checked ? HEARTBEAT_ACTIVE_MS : HEARTBEAT_IDLE_MS);
+      }
+
+      // Stop Tracking
+      async function stopTracking() {
+        haptic(15);
+        clearTimeout(timer);
+        active = false;
+        currentRoom = null;
+        releaseWakeLock();
+        render();
+
+        try {
+          const data = await sendPresence(false);
+          litRooms = data.litRooms || [];
+          renderRoomsList();
+        } catch (_) {}
+      }
+
+      // Error helper
+      function showError(msg) {
+        if (!msg) {
+          errorToast.textContent = '';
+          errorToast.classList.remove('show');
+        } else {
+          errorToast.textContent = msg;
+          errorToast.classList.add('show');
+        }
+      }
+
+      // Toggle Power Button
+      powerBtn.addEventListener('click', () => {
+        if (active) {
+          stopTracking();
+        } else {
+          startTracking();
+        }
+      });
+
+      followToggle.addEventListener('change', () => {
+        haptic(10);
+        render();
+      });
+
+      // Manual Room Light Toggle
+      window.toggleRoomLight = async function(room) {
+        haptic(20);
+        try {
+          const res = await fetch('/api/action/toggle-light', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ room }),
+          });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || 'Fehler beim Umschalten');
+          fetchStatus();
+        } catch (err) {
+          showError(`Licht-Umschalten fehlgeschlagen: ${err.message}`);
+        }
+      };
+
+      // 3.1: Clap Test Simulation (triggers double clap event)
+      clapTestBtn.addEventListener('click', async () => {
+        haptic(35);
+        try {
+          const targetRoom = currentRoom || (knownRooms.length > 0 ? knownRooms[0] : null);
+          const res = await fetch('/api/action/simulate-clap', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ room: targetRoom }),
+          });
+          if (!res.ok) throw new Error('Test fehlgeschlagen');
+          fetchStatus();
+        } catch (err) {
+          showError(`Klatsch-Test Fehler: ${err.message}`);
+        }
+      });
+
+      // Quick Refresh
+      async function fetchStatus() {
+        haptic(10);
+        try {
+          const res = await fetch('/api/status');
+          if (res.ok) {
+            const data = await res.json();
+            knownRooms = data.rooms.map(r => r.id);
+            litRooms = data.litRooms || [];
+            userCountBadge.textContent = `${data.usersCount} aktiv`;
+            haDot.className = data.haConfigured ? 'status-dot online' : 'status-dot warn';
+            haText.textContent = data.haConfigured ? 'HA Verbunden' : 'HA Offline';
+            if (data.calibration) calibrations = data.calibration;
+            if (data.pathLighting) {
+              pathSettings = data.pathLighting;
+              pathToggle.checked = Boolean(pathSettings.enabled);
+              pathExpandable.classList.toggle('open', pathToggle.checked);
+              pathDurationInput.value = pathSettings.durationSec || 30;
+            }
+            if (data.recentLogs) renderFeed(data.recentLogs);
+            render();
+          }
+        } catch (_) {}
+      }
+
+      refreshBtn.addEventListener('click', fetchStatus);
+
+      // Page Unload / Mobile Background Beacon
+      window.addEventListener('pagehide', () => {
+        if (!active) return;
+        const blob = new Blob([JSON.stringify({ id: trackerId, active: false })], { type: 'application/json' });
+        navigator.sendBeacon('/api/presence', blob);
+      });
+
+      // Initial Fetch
+      fetchStatus();
+      render();
+    </script>
+  </body>
+</html>

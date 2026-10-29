@@ -1,0 +1,55 @@
+{
+  "name": "Raum-Tracking Smart Home",
+  "short_name": "RaumTracking",
+  "description": "Präsenzbasiertes Raum-Tracking und Home Assistant Steuerung",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#090d16",
+  "theme_color": "#0f172a",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='128' fill='%232563eb'/><path d='M256 110c-80.6 0-146 65.4-146 146 0 46.7 22.1 88.3 56.4 115.1l17.7-22.6c-27.8-21.7-45.7-55.5-45.7-93.5 0-65.1 52.9-118 118-118s118 52.9 118 118c0 38-17.9 71.8-45.7 93.5l17.7 22.6C425.9 344.3 448 302.7 448 256c0-80.6-65.4-146-146-146zm-64 146c0-35.3 28.7-64 64-64s64 28.7 64 64c0 23.3-12.5 43.8-31.2 55.1l-14-17.8c11.9-7.2 19.8-20.2 19.8-35 0-22.1-17.9-40-40-40s-40 17.9-40 40c0 14.8 7.9 27.8 19.8 35l-14 17.8C204.5 299.8 192 279.3 192 256zm64-24a24 24 0 100 48 24 24 0 000-48z' fill='%23ffffff'/><circle cx='256' cy='410' r='16' fill='%2338bdf8'/></svg>",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Tracking Starten",
+      "short_name": "Start",
+      "description": "Raum-Tracking sofort aktivieren",
+      "url": "/?action=start",
+      "icons": [
+        {
+          "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'><circle cx='48' cy='48' r='48' fill='%2310b981'/><polygon points='38,28 70,48 38,68' fill='white'/></svg>",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Tracking Beenden",
+      "short_name": "Stop",
+      "description": "Raum-Tracking pausieren",
+      "url": "/?action=stop",
+      "icons": [
+        {
+          "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'><circle cx='48' cy='48' r='48' fill='%23ef4444'/><rect x='30' y='30' width='36' height='36' rx='6' fill='white'/></svg>",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Klatsch-Test ausführen",
+      "short_name": "Klatsch-Test",
+      "description": "Doppelklatsch-Signal simulieren",
+      "url": "/?action=clap",
+      "icons": [
+        {
+          "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96'><circle cx='48' cy='48' r='48' fill='%23f59e0b'/><text x='48' y='62' font-size='44' text-anchor='middle'>👏</text></svg>",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ]
+}

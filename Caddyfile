@@ -1,0 +1,9 @@
+# Caddy Reverse Proxy fuer lokales HTTPS
+# Passe die IP-Adresse unten an deine PC-IP an (ipconfig -> IPv4)
+# Passe die Zertifikatdateinamen an (was mkcert erzeugt hat)
+
+https://192.168.1.100 {
+  tls ./192.168.1.100+2.pem ./192.168.1.100+2-key.pem
+
+  reverse_proxy localhost:3000
+}

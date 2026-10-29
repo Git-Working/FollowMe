@@ -1,0 +1,13 @@
+services:
+  raum-tracking:
+    build: .
+    container_name: raum-tracking
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    volumes:
+      - ./rooms.json:/app/rooms.json:ro
+      - ./calibration.json:/app/calibration.json
+      - ./settings.json:/app/settings.json

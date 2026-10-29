@@ -1,0 +1,18 @@
+{
+  "name": "raum-tracking",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Presence-based room tracking and Home Assistant control",
+  "scripts": {
+    "dev": "nuxt dev",
+    "build": "nuxt build",
+    "start": "node .output/server/index.mjs",
+    "start:standalone": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "lucide-vue-next": "^1.0.0",
+    "nuxt": "^4.5.2",
+    "vue": "^3.5.44"
+  }
+}
