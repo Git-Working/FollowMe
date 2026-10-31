@@ -17,10 +17,10 @@
   <rect width="900" height="480" fill="#090d16" rx="16"/>
 
   <text x="450" y="45" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="22" fill="#ffffff" font-weight="700">
-    ESP32-C3 Mini + INMP441 I2S Mikrofon Schaltplan
+    ESP32-C3 Mini + INMP441 I2S Microphone Wiring Diagram
   </text>
   <text x="450" y="70" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="14" fill="#94a3b8">
-    Direktverbindung für Klatscherkennung &amp; Raumpräsenz
+    Direct pinout for acoustic clap detection &amp; room presence tracking
   </text>
 
   <!-- INMP441 Module (Left) -->
