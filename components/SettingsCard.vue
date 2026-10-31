@@ -46,42 +46,40 @@
       </label>
 
       <!-- MAC Configuration -->
-      <div class="expandable" :class="{ open: follow }">
-        <div style="padding-top: 4px;">
-          <label class="field-label">WLAN-MAC-Adresse deines Smartphones:</label>
-          <div class="input-wrapper">
-            <input
-              :value="mac"
-              class="text-input mac-input"
-              type="text"
-              inputmode="text"
-              autocapitalize="characters"
-              autocomplete="off"
-              spellcheck="false"
-              placeholder="AA:BB:CC:DD:EE:FF"
-              maxlength="17"
-              :disabled="active"
-              @input="handleMacInput"
-            />
+      <div style="padding-top: 4px;">
+        <label class="field-label">WLAN-MAC-Adresse deines Smartphones:</label>
+        <div class="input-wrapper">
+          <input
+            :value="mac"
+            class="text-input mac-input"
+            type="text"
+            inputmode="text"
+            autocapitalize="characters"
+            autocomplete="off"
+            spellcheck="false"
+            placeholder="AA:BB:CC:DD:EE:FF"
+            maxlength="17"
+            :disabled="active"
+            @input="handleMacInput"
+          />
+        </div>
+        <p class="field-hint">
+          Die ESP32-Sensoren lauschen auf diese Adresse, um deine Entfernung zu messen.
+        </p>
+
+        <button type="button" class="guide-btn" @click="guideOpen = !guideOpen">
+          Wie finde ich meine MAC-Adresse?
+        </button>
+
+        <div class="guide-box expandable" :class="{ open: guideOpen }">
+          <div>
+            <strong>iPhone (iOS):</strong><br />
+            Einstellungen → WLAN → tippe auf das (i) neben deinem Heim-WLAN.<br />
+            Wichtig: Schalte <em>„Private WLAN-Adresse"</em> aus — sonst ändert sich die Adresse täglich.
           </div>
-          <p class="field-hint">
-            Die ESP32-Sensoren lauschen auf diese Adresse, um deine Entfernung zu messen.
-          </p>
-
-          <button type="button" class="guide-btn" @click="guideOpen = !guideOpen">
-            Wie finde ich meine MAC-Adresse?
-          </button>
-
-          <div class="guide-box expandable" :class="{ open: guideOpen }">
-            <div>
-              <strong>iPhone (iOS):</strong><br />
-              Einstellungen → WLAN → tippe auf das (i) neben deinem Heim-WLAN.<br />
-              Wichtig: Schalte <em>„Private WLAN-Adresse"</em> aus — sonst ändert sich die Adresse täglich.
-            </div>
-            <div>
-              <strong>Android:</strong><br />
-              Einstellungen → WLAN → Zahnrad neben deinem Netzwerk → Erweitert → auf <em>„Geräte-MAC verwenden"</em> stellen.
-            </div>
+          <div>
+            <strong>Android:</strong><br />
+            Einstellungen → WLAN → Zahnrad neben deinem Netzwerk → Erweitert → auf <em>„Geräte-MAC verwenden"</em> stellen.
           </div>
         </div>
       </div>

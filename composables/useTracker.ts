@@ -113,7 +113,7 @@ export function useTracker() {
     }
 
     if (active.value) {
-      heartbeatTimer = setTimeout(heartbeat, follow.value ? HEARTBEAT_ACTIVE_MS : HEARTBEAT_IDLE_MS)
+      heartbeatTimer = setTimeout(heartbeat, HEARTBEAT_ACTIVE_MS)
     }
   }
 
@@ -121,12 +121,10 @@ export function useTracker() {
     vibrate(25)
     errorMsg.value = ''
 
-    if (follow.value) {
-      const trimmedMac = mac.value.trim()
-      if (!MAC_PATTERN.test(trimmedMac)) {
-        errorMsg.value = 'Bitte eine gültige WLAN-MAC-Adresse angeben (z.B. AA:BB:CC:DD:EE:FF).'
-        return
-      }
+    const trimmedMac = mac.value.trim()
+    if (trimmedMac && !MAC_PATTERN.test(trimmedMac)) {
+      errorMsg.value = 'Bitte eine gültige WLAN-MAC-Adresse angeben (z.B. AA:BB:CC:DD:EE:FF).'
+      return
     }
 
     try {
@@ -144,7 +142,7 @@ export function useTracker() {
     active.value = true
     if (keepScreenAwake.value) requestWakeLock()
 
-    heartbeatTimer = setTimeout(heartbeat, follow.value ? HEARTBEAT_ACTIVE_MS : HEARTBEAT_IDLE_MS)
+    heartbeatTimer = setTimeout(heartbeat, HEARTBEAT_ACTIVE_MS)
   }
 
   async function stop() {

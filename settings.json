@@ -1,6 +1,6 @@
 {
   "pathLighting": {
-    "enabled": true,
+    "enabled": false,
     "hallwayRoom": "flur",
     "durationSec": 40
   }

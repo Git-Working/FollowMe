@@ -1,0 +1,114 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 860" width="100%" height="100%">
+  <defs>
+    <linearGradient id="phoneBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#090d16"/>
+      <stop offset="100%" stop-color="#030712"/>
+    </linearGradient>
+    <linearGradient id="radarBtnGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0284c7"/>
+      <stop offset="100%" stop-color="#0369a1"/>
+    </linearGradient>
+    <filter id="phoneShadow" x="-10%" y="-5%" width="120%" height="110%">
+      <feDropShadow dx="0" dy="16" stdDeviation="24" flood-color="#000000" flood-opacity="0.6"/>
+    </filter>
+    <filter id="glowGreen" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- Phone Shell -->
+  <rect x="10" y="10" width="400" height="840" rx="44" fill="#1e293b" stroke="#334155" stroke-width="4" filter="url(#phoneShadow)"/>
+  <rect x="16" y="16" width="388" height="828" rx="38" fill="url(#phoneBg)"/>
+
+  <!-- Dynamic Island / Speaker Notch -->
+  <rect x="145" y="28" width="130" height="28" rx="14" fill="#000000"/>
+
+  <!-- App Header -->
+  <g transform="translate(36, 80)">
+    <circle cx="16" cy="16" r="16" fill="#0284c7" opacity="0.2"/>
+    <path d="M16 6 A 10 10 0 0 1 26 16 L 22 16 A 6 6 0 0 0 16 10 Z" fill="#38bdf8"/>
+    <circle cx="16" cy="16" r="4" fill="#38bdf8"/>
+    <text x="44" y="22" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="18" fill="#ffffff" font-weight="800" letter-spacing="-0.5">FollowMe</text>
+    <rect x="290" y="4" width="60" height="24" rx="12" fill="#064e3b"/>
+    <circle cx="300" cy="16" r="4" fill="#34d399"/>
+    <text x="310" y="20" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" fill="#34d399" font-weight="700">ONLINE</text>
+  </g>
+
+  <!-- Big Hero Radar Card -->
+  <g transform="translate(36, 130)">
+    <rect width="348" height="300" rx="24" fill="#0f172a" stroke="#1e293b" stroke-width="1.5"/>
+    
+    <!-- Big Radar Circle Button -->
+    <g transform="translate(174, 130)">
+      <!-- Radar Waves -->
+      <circle r="95" fill="none" stroke="#38bdf8" stroke-width="1.5" opacity="0.15"/>
+      <circle r="75" fill="none" stroke="#38bdf8" stroke-width="1.5" opacity="0.3"/>
+      
+      <!-- Button Background -->
+      <circle r="58" fill="url(#radarBtnGrad)" stroke="#38bdf8" stroke-width="2"/>
+      
+      <!-- Radar Icon -->
+      <path d="M-15 -10 A 20 20 0 0 1 15 -10" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M-22 -18 A 30 30 0 0 1 22 -18" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+      <circle cx="0" cy="5" r="5" fill="#ffffff"/>
+
+      <text y="30" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" fill="#e0f2fe" font-weight="700" letter-spacing="1">TRACKING AKTIV</text>
+    </g>
+
+    <!-- Current Room Banner -->
+    <g transform="translate(24, 235)">
+      <rect width="300" height="48" rx="14" fill="#064e3b" stroke="#059669" stroke-width="1"/>
+      <circle cx="24" cy="24" r="6" fill="#34d399" filter="url(#glowGreen)"/>
+      <text x="42" y="22" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" fill="#a7f3d0" font-weight="600">ERKANNTES ZIMMER</text>
+      <text x="42" y="38" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="16" fill="#ffffff" font-weight="800">Wohnzimmer</text>
+      <text x="280" y="30" text-anchor="end" font-family="monospace" font-size="13" fill="#34d399" font-weight="bold">-54 dBm</text>
+    </g>
+  </g>
+
+  <!-- Room Grid Title -->
+  <g transform="translate(36, 455)">
+    <text font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="16" fill="#ffffff" font-weight="700">Räume &amp; Beleuchtung</text>
+  </g>
+
+  <!-- Rooms Cards -->
+  <g transform="translate(36, 480)">
+    <!-- Room 1: Wohnzimmer (Active) -->
+    <rect width="348" height="74" rx="16" fill="#1e293b" stroke="#059669" stroke-width="1.5"/>
+    <circle cx="34" cy="37" r="18" fill="#064e3b"/>
+    <text x="34" y="42" text-anchor="middle" font-size="16">🛋️</text>
+    <text x="64" y="32" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="15" fill="#ffffff" font-weight="700">Wohnzimmer</text>
+    <text x="64" y="49" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" fill="#34d399">Präsenz erkannt • Licht AN</text>
+    <rect x="265" y="24" width="65" height="26" rx="13" fill="#059669"/>
+    <text x="297" y="41" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" fill="#ffffff" font-weight="bold">AN</text>
+
+    <!-- Room 2: Küche -->
+    <g transform="translate(0, 86)">
+      <rect width="348" height="74" rx="16" fill="#0f172a" stroke="#1e293b" stroke-width="1"/>
+      <circle cx="34" cy="37" r="18" fill="#1e293b"/>
+      <text x="34" y="42" text-anchor="middle" font-size="16">🍳</text>
+      <text x="64" y="32" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="15" fill="#ffffff" font-weight="700">Küche</text>
+      <text x="64" y="49" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" fill="#64748b">Leer • -78 dBm</text>
+      <rect x="265" y="24" width="65" height="26" rx="13" fill="#1e293b"/>
+      <text x="297" y="41" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" fill="#64748b" font-weight="bold">AUS</text>
+    </g>
+
+    <!-- Room 3: Flur / Pfadbeleuchtung -->
+    <g transform="translate(0, 172)">
+      <rect width="348" height="74" rx="16" fill="#0f172a" stroke="#1e293b" stroke-width="1"/>
+      <circle cx="34" cy="37" r="18" fill="#1e293b"/>
+      <text x="34" y="42" text-anchor="middle" font-size="16">🚪</text>
+      <text x="64" y="32" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="15" fill="#ffffff" font-weight="700">Flur (Pfad)</text>
+      <text x="64" y="49" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" fill="#64748b">Bereit für Raumwechsel</text>
+      <rect x="265" y="24" width="65" height="26" rx="13" fill="#1e293b"/>
+      <text x="297" y="41" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" fill="#64748b" font-weight="bold">STANDBY</text>
+    </g>
+  </g>
+
+  <!-- Activity Bar (Bottom) -->
+  <g transform="translate(36, 750)">
+    <rect width="348" height="48" rx="12" fill="#0f172a" stroke="#1e293b"/>
+    <circle cx="24" cy="24" r="5" fill="#38bdf8"/>
+    <text x="38" y="28" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" fill="#94a3b8">Letztes Event: <tspan fill="#ffffff" font-weight="600">Doppel-Klatsch erkannt (Wohnzimmer)</tspan></text>
+  </g>
+</svg>

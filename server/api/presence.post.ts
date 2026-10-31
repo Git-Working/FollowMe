@@ -34,38 +34,35 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  const followMac = wantsFollow ? normalizeMac(mac) : null
-  if (wantsFollow && !followMac) {
-    throw createError({ statusCode: 400, statusMessage: 'Bitte gib eine gültige WLAN-MAC-Adresse ein.' })
-  }
+  const userMac = normalizeMac(mac)
 
   const displayName = String(name || 'Mein Smartphone').slice(0, 40)
   const prev = activeUsers.get(id)
   if (!prev) {
-    logActivity('presence', `Nutzer aktiv: ${displayName}${followMac ? ` (${followMac})` : ''}`)
+    logActivity('presence', `Nutzer aktiv: ${displayName}${userMac ? ` (${userMac})` : ''}`)
   }
 
   activeUsers.set(id, {
     name: displayName,
     lastSeen: Date.now(),
     follow: Boolean(wantsFollow),
-    mac: followMac,
+    mac: userMac,
     room: prev?.room || null,
     roomSince: prev?.roomSince || 0,
   })
 
   // Support BLE beacons from smartphone
-  if (wantsFollow && followMac && bleSignals && typeof bleSignals === 'object') {
+  if (userMac && bleSignals && typeof bleSignals === 'object') {
     const now = Date.now()
     for (const [bRoom, bRssi] of Object.entries(bleSignals)) {
       if (rooms.has(bRoom) && Number.isFinite(Number(bRssi))) {
-        addReading(followMac, bRoom, Number(bRssi), now)
+        addReading(userMac, bRoom, Number(bRssi), now)
       }
     }
   }
 
   const currentUser = activeUsers.get(id)!
-  const signals = followMac ? getReadingsForMac(followMac) : {}
+  const signals = userMac ? getReadingsForMac(userMac) : {}
 
   return {
     ok: true,

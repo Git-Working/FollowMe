@@ -25,19 +25,19 @@ const bool ENABLE_BLE_BEACON = true;
 // 3.1: Doppel-Klatsch-Erkennung (Standard: true)
 const bool ENABLE_MIC = true;
 const bool REQUIRE_DOUBLE_CLAP = true;
-const uint32_t DOUBLE_CLAP_MIN_GAP_MS = 180;  // Filtert akustischen Hall
-const uint32_t DOUBLE_CLAP_MAX_GAP_MS = 850;  // Maximales Zeitfenster zwischen 2 Klatschen
-const uint32_t COOLDOWN_MS = 1500;            // Sperrzeit nach Auslösung
+const uint32_t DOUBLE_CLAP_MIN_GAP_MS = 150;  // Mindestabstand (filtert Hall / Nachhall)
+const uint32_t DOUBLE_CLAP_MAX_GAP_MS = 1100; // Maximales Zeitfenster zwischen 2 Klatschen (1.1s)
+const uint32_t COOLDOWN_MS = 1200;            // Sperrzeit nach erfolgreicher Auslösung
 
 // I2S Mikrofon-Pins (z.B. INMP441)
-const int PIN_SCK = 4;
-const int PIN_WS = 5;
-const int PIN_SD = 6;
+const int PIN_SCK = 2;
+const int PIN_WS = 3;
+const int PIN_SD = 4;
 
 const uint32_t SAMPLE_RATE = 16000;
 const size_t BLOCK_SAMPLES = 256;
-const float CLAP_RATIO = 6.0f;
-const int32_t MIN_CLAP_LEVEL = 400000;
+const float CLAP_RATIO = 4.5f;                // Impuls-Verhältnis zur Hintergrundlautstärke
+const int32_t MIN_CLAP_LEVEL = 250000;        // Empfindlicherer Schwellenwert (Spitzenwert)
 
 // Wi-Fi Polling & Reporting
 const uint32_t POLL_INTERVAL_MS = 5000;

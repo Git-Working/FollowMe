@@ -1,114 +1,169 @@
-# Room-Tracking Smart Home
+<div align="center">
 
-A local smart home system for room-accurate smartphone localization using ESP32 nodes (BLE), a Nuxt 4 / Vue 3 web application, and direct integration with Home Assistant (including "light follows me" logic, hallway path lighting, and microphone double-clap detection).
+![FollowMe Smart Home Hero](docs/hero-banner.svg)
 
-## Technology Stack
+# 📡 FollowMe — Room-Tracking Smart Home
 
-* **Frontend:** Nuxt 4 (Vue 3 SPA, Mobile-first, Dark Mode, Touch-optimized)
-* **Backend:** Nitro Server Engine (API and processing engine)
-* **Hardware:** ESP32 (Arduino / C++) with BLE (iBeacon) & I2S Microphone
-* **Smart Home:** Home Assistant REST API
+**Lokale, präzise Smartphone-Ortung per ESP32-WLAN-Sniffing & Bluetooth LE, automatisches Raumlicht ("Light Follows Me"), adaptive Flur-Pfadbeleuchtung und akustische Doppel-Klatsch-Steuerung über Home Assistant.**
 
-## 1. System Overview
+[![Nuxt 4](https://img.shields.io/badge/Nuxt-4.x-00DC82?style=for-the-badge&logo=nuxtdotjs&logoColor=white)](https://nuxt.com/)
+[![Vue 3](https://img.shields.io/badge/Vue-3.x-4FC08D?style=for-the-badge&logo=vuedotjs&logoColor=white)](https://vuejs.org/)
+[![ESP32](https://img.shields.io/badge/Hardware-ESP32--C3%20%2F%20ESP32-E7352C?style=for-the-badge&logo=espressif&logoColor=white)](https://www.espressif.com/)
+[![Home Assistant](https://img.shields.io/badge/Integration-Home%20Assistant-41BDF5?style=for-the-badge&logo=homeassistant&logoColor=white)](https://www.home-assistant.io/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-Ready-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 
-The system tracks your smartphone using Signal Strength (RSSI) received by distributed ESP32 nodes throughout your home. As soon as you enter a room, Home Assistant automatically switches on the lights ("light follows me") and turns them off after a brief delay when you leave. Additionally, lights can be manually toggled via a double-clap detected by microphones on the ESP32 nodes.
+</div>
 
-## 2. Key Features
+---
 
-* **"Light Follows Me":** Automatically turns on lights upon entering a room and turns them off after a configurable delay when leaving.
-* **Hallway Path Lighting:** Optional automation that temporarily switches on the hallway light when moving between rooms.
-* **Double-Clap Detection:** Manual control of room lighting using a microphone connected to the ESP32 (or tested via the UI).
-* **Signal Calibration & RSSI Filtering:** Offsets structural dampening (walls/furniture) per room using manual offsets (+/- dB) and one-click auto-calibration.
-* **Automation & Webhooks:** Dedicated start and stop URLs for Apple Shortcuts, Android routines, or HTTP shortcuts.
-* **Live Room Management (`/rooms`):** Visual management interface for rooms and Home Assistant entities (persisted directly to `rooms.json` without requiring a server restart).
-* **Activity Feed:** Live log displaying recent system events.
+## 🌟 Highlights
 
-## 3. Architecture & Components
+* 🎯 **Raumgenaue Ortung ohne Wearables:** Verfolgt dein normales Smartphone über RSSI-Sniffing (WLAN-Pakete) und iBeacon-Broadcasts verteilter ESP32-Nodes.
+* 💡 **"Light Follows Me" Automatik:** Schaltet beim Betreten eines Raums vollautomatisch das passende Licht ein und nach einstellbarer Verzögerung (z. B. 5 Sekunden) beim Verlassen wieder aus.
+* 👏 **Akustische Doppel-Klatsch-Erkennung:** Integriertes I2S-Mikrofon (INMP441) auf jedem Node toggelt das Licht im jeweiligen Raum bei zwei schnellen Klatschern – unabhängig vom Smartphone.
+* 🚶 **Intelligente Flur-Pfadbeleuchtung:** Erkennt Raumwechsel und schaltet automatisch für einstellbare Sekunden (z. B. 40 s) das Flurlicht als Orientierungshilfe an.
+* 🎚️ **Signaldämpfung & Raum-Kalibrierung:** Gleicht dicke Wände oder Möbel millimetergenau per Software-Offset (+/- dB) im Webinterface aus.
+* 📱 **Mobile-First Touch-Dashboard:** Nuxt 4 SPA mit Dark-Mode, Screen Wake-Lock und Live-Radar.
 
-### A. Frontend (Nuxt 4 / Vue 3 SPA)
+---
 
-Mobile-first web app with Dark Mode, optimized for touchscreens and status overviews:
+## 🏗️ Systemarchitektur
 
-* **Dashboard (`/`):**
-  * **Hero Radar Controller:** Large touch button to start/stop tracking, displaying current location and signal strength.
-  * **Settings:** Device name, "Light follows me" toggle, MAC address input (with helper tooltips), and display Screen Wake Lock.
-  * **Path Lighting:** Optional automation for hallway transitions.
-  * **Signal Calibration:** Adjustment for room signal dampening.
-  * **Automation / Webhooks:** Trigger URLs for external control.
-  * **Homescreen & Widgets:** Instructions and URLs for HTTP Shortcuts / Apple Shortcuts, including context on HTTP PWA limitations.
-  * **Rooms & Lighting:** Overview of all configured rooms, live signal strength indicators, manual switches, and direct link to room management.
-  * **Quick Actions:** Clap test simulation and manual refresh.
-  * **Activity Feed:** Live event logger.
+```mermaid
+flowchart TD
+    subgraph Raum 1: Wohnzimmer
+        ESP1["ESP32 Node (Wohnzimmer)<br/>• Wi-Fi Sniffing<br/>• INMP441 Mikrofon"]
+    end
 
-* **Room Configuration (`/rooms`):**
-  * Visual editor for managing rooms and Home Assistant entity assignments.
-  * Add, rename, or delete rooms with instant saving to `rooms.json`.
+    subgraph Raum 2: Küche
+        ESP2["ESP32 Node (Küche)<br/>• Wi-Fi Sniffing<br/>• INMP441 Mikrofon"]
+    end
 
-### B. Backend (Nitro Server Engine)
+    Phone["📱 Smartphone<br/>(WLAN-Sender &amp; Web-Dashboard)"] -. "WLAN-Pakete (RSSI)" .-> ESP1
+    Phone -. "WLAN-Pakete (RSSI)" .-> ESP2
 
-* **Follow Engine (`server/utils/followEngine.ts`):**
-  Evaluates incoming signal strengths, filters noise and hysteresis, determines room presence, and manages state transition timers.
+    ESP1 -- "POST /api/rssi &amp; /track" --> Server["🖥️ FollowMe Server (Nuxt 4 / Nitro)<br/>• RSSI-Glättung &amp; Hysterese<br/>• Präsenz-Zustandsmaschine"]
+    ESP2 -- "POST /api/rssi &amp; /track" --> Server
 
-* **Home Assistant Integration (`server/utils/haService.ts`):**
-  Automatically detects whether an entity is a `switch.*` or `light.*` device and triggers the appropriate HA service (`turn_on`, `turn_off`, `toggle`).
-
-* **Core API Routes:**
-  * `POST /api/presence` – Heartbeat and signal data transmission from the smartphone.
-  * `POST /api/rssi` – Signal reports from ESP32 nodes.
-  * `POST /api/track` – Clap event reports from ESP32 microphones.
-  * `GET/POST /api/action/simulate-clap` – Simulated clap test trigger.
-  * `GET/POST /api/action/start` & `GET/POST /api/action/stop` – Webhook triggers for external automations.
-  * `GET/POST /api/rooms` – Room entity mapping management.
-  * `GET/POST /api/calibration` & `GET/POST /api/settings` – Calibration and hallway lighting preferences.
-
-### C. Hardware (ESP32 Node / `room_node.ino`)
-
-* Runs on ESP32 equipped with an I2S microphone and Bluetooth LE.
-* **iBeacon:** Broadcasts BLE packets allowing the smartphone to measure proximity to each node.
-* **Double-Clap Detection:** Listens for two defined audio peak thresholds within a set time window to transmit a toggle command to the server.
-* **Configuration:** Requires only `ROOM_ID` (e.g., `living_room`) and the server IP address defined in the sketch code.
-
-## 4. Configuration
-
-### `.env` — Home Assistant Credentials
-
-Create a `.env` file in the project root directory with your credentials:
-
-```env
-HA_URL=http://ha.lan:8123
-HA_TOKEN=your_long_lived_access_token_here
-HA_ENTITY_ID=switch.shelly1mini_6055f99b5fdc_switch_0
-HA_SERVICE=switch/toggle
+    Server ==>|"REST API (turn_on / turn_off / toggle)"| HA["🏠 Home Assistant<br/>(Lichter &amp; Schalter)"]
 ```
 
-### `rooms.json` — Room & Entity Mappings
+---
 
-Links room IDs to Home Assistant entity IDs. Can be configured directly via the file or through the web interface at `/rooms`.
+## 📱 Mobile Dashboard
 
-## 5. Build & Deployment
+<div align="center">
+  <img src="docs/dashboard-preview.svg" alt="FollowMe Dashboard Preview" width="380"/>
+</div>
 
-### Building after code changes:
+* **Hero Radar Controller:** Großer Touch-Button zum Ein-/Ausschalten des Trackings inklusive Live-Status.
+* **Räume & Schalter:** Sofortige Übersicht über alle konfigurierten Räume, Live-Signalstärken und manuelle Schalter.
+* **Signal Calibration:** Dämpfungsausgleich pro Raum mit 1-Klick Auto-Kalibrierung.
+* **Aktivitäts-Feed:** Live-Log aller Klatsch-, Präsenz- und Schaltvorgänge.
 
-```powershell
-cd "c:\Users\timor\Downloads\Neuer Ordner (3)"
-npx nuxi build
-```
+---
 
-### Starting the server:
+## 🔌 Hardware & Verkabelung
 
-```powershell
-cd "c:\Users\timor\Downloads\Neuer Ordner (3)"
-node .output/server/index.mjs
-```
+Jeder Raum erhält einen kompakten **ESP32 Node** (z. B. *ESP32-C3 Mini* oder *ESP32 DevKit*) mit einem **INMP441 I2S-Mikrofon**.
 
-### Web Access:
+![Verkabelungsdiagramm](docs/wiring.svg)
 
-* **Dashboard:** `http://<SERVER-IP>:3000/`
-* **Room Management:** `http://<SERVER-IP>:3000/rooms`
+### Pinbelegung (ESP32-C3 Mini):
 
-## 6. Project Structure Overview
+| INMP441 Pin | ESP32-C3 Pin | Funktion |
+| :--- | :--- | :--- |
+| **VDD** | **3.3V** | Stromversorgung (niemals an 5V!) |
+| **GND** | **GND** | Masse |
+| **L/R** | **GND** | Linker Audiokanal (`I2S_STD_SLOT_LEFT`) |
+| **SCK / BCLK** | **GPIO 2** | I2S Clock |
+| **WS / LRCL** | **GPIO 3** | I2S Word Select |
+| **SD / DOUT** | **GPIO 4** | I2S Serial Data |
 
-* `server/utils/followEngine.ts` – Core signal processing and presence state machine
-* `server/utils/haService.ts` – Home Assistant REST API client
-* `rooms.json` – Room to Home Assistant entity associations
-* `.env` – System environment variables and API tokens
+> [!TIP]
+> **Für Standard ESP32 (WROOM-32):** Verwende z. B. `SCK = GPIO 14`, `WS = GPIO 15`, `SD = GPIO 32`. Vermeide auf klassischen Boards Pins zwischen 6 und 11 (interner Flash-Speicher).
+
+---
+
+## 🚀 Schnellanleitung (Quick Start)
+
+### 1. Server einrichten
+
+1. **Repository klonen & Abhängigkeiten installieren:**
+   ```bash
+   git clone https://github.com/timorywelski/FollowMe.git
+   cd FollowMe
+   npm install
+   ```
+
+2. **Umgebungsvariablen anlegen:**
+   Kopiere `.env.placeholder` zu `.env`:
+   ```bash
+   cp .env.placeholder .env
+   ```
+   Trage deine Home Assistant URL und deinen langlebigen Token ein:
+   ```env
+   PORT=3000
+   HA_URL=http://192.168.1.100:8123
+   HA_TOKEN=dein_long_lived_access_token_hier
+   ```
+
+3. **Räume definieren ([rooms.json](rooms.json)):**
+   Ordne deine Raum-IDs den Home Assistant Entities zu:
+   ```json
+   {
+     "wohnzimmer": "switch.shelly1mini_wohnzimmer",
+     "kueche": "light.kueche_decke",
+     "schlafzimmer": "light.schlafzimmer_spots"
+   }
+   ```
+
+4. **Server starten:**
+   ```bash
+   npm run dev
+   # Für den Dauerbetrieb:
+   npm run build && npm run start
+   ```
+
+---
+
+### 2. ESP32 flashen
+
+1. Öffne die Sketch-Datei (`Room-Follower.ino` oder `room_node.ino`) in der **Arduino IDE**.
+2. Passe die Konfiguration ganz oben an:
+   ```cpp
+   const char* WIFI_SSID     = "DeinWLAN";
+   const char* WIFI_PASSWORD = "DeinPasswort";
+   const char* SERVER_BASE   = "http://192.168.1.136:3000"; // IP deines Server-PCs
+   const char* ROOM_ID       = "wohnzimmer";                // Eindeutiger Raum
+   ```
+3. Wähle unter **Werkzeuge $\rightarrow$ Partition Scheme** die Option **Huge APP (3MB No OTA)**.
+4. Sketch auf den ESP32 hochladen!
+
+---
+
+### 3. Smartphone verbinden
+
+1. Öffne auf deinem Smartphone im WLAN: `http://<DEINE-SERVER-IP>:3000`
+2. Trage unter **Einstellungen** deine **WLAN-MAC-Adresse** ein *(Wichtig: In den WLAN-Details des Handys „Private WLAN-Adresse“ deaktivieren)*.
+3. Tippe auf den großen Radar-Button $\rightarrow$ **Fertig!**
+
+---
+
+## 🌐 API & Webhook Schnittstellen
+
+| Methode | Route | Beschreibung |
+| :--- | :--- | :--- |
+| `POST` | `/api/presence` | Heartbeat & Signal-Meldungen vom Smartphone |
+| `POST` | `/api/rssi` | Signalstärke-Reports (RSSI) der ESP32 Nodes |
+| `POST` | `/track` oder `/api/track` | Klatsch-Events der ESP32 Mikrofone |
+| `GET` | `/api/node` | Konfigurations-Polling für ESP32 Nodes (aktivierte MACs) |
+| `GET` | `/api/status` | Vollständiger System- und Raumzustand für Dashboards |
+| `ALL` | `/api/action/start` | Webhook für Apple Kurzbefehle / Android Routinen (Start) |
+| `ALL` | `/api/action/stop` | Webhook für Automationen (Stopp) |
+
+---
+
+## 📄 Lizenz
+
+MIT License — Frei verwendbar und anpassbar für dein eigenes Smart Home!

@@ -129,23 +129,21 @@ function pickRoom(user: ActiveUser, now: number) {
 }
 
 export function evaluateFollow(now = Date.now()) {
-  const followed = new Set<string>()
+  const trackedMacs = new Set<string>()
   for (const user of activeUsers.values()) {
-    if (user.follow && user.mac) followed.add(user.mac)
+    if (user.mac) trackedMacs.add(user.mac)
   }
 
   for (const mac of readings.keys()) {
-    if (!followed.has(mac)) readings.delete(mac)
+    if (!trackedMacs.has(mac)) readings.delete(mac)
   }
 
   const occupied = new Set<string>()
   for (const user of activeUsers.values()) {
-    if (!user.follow) {
-      user.room = null
-      continue
-    }
     const room = pickRoom(user, now)
-    if (room) occupied.add(room)
+    if (user.follow && room) {
+      occupied.add(room)
+    }
   }
 
   // Turn ON lights for occupied rooms
@@ -208,7 +206,7 @@ export function isRoomLit(room: string): boolean {
 export function getFollowedMacs(): Set<string> {
   const macs = new Set<string>()
   for (const user of activeUsers.values()) {
-    if (user.follow && user.mac) macs.add(user.mac)
+    if (user.mac) macs.add(user.mac)
   }
   return macs
 }
