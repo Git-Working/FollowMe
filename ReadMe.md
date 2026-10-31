@@ -91,7 +91,7 @@ Each room is monitored by an **ESP32 Node** (such as an *ESP32-C3 Mini* or *ESP3
 
 1. **Clone the repository & install dependencies:**
    ```bash
-   git clone https://github.com/timorywelski/FollowMe.git
+   git clone https://github.com/Git-Working/FollowMe.git
    cd FollowMe
    npm install
    ```
