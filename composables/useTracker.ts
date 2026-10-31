@@ -39,6 +39,10 @@ export function useTracker() {
   const keepScreenAwake = ref(false)
 
   const HEARTBEAT_ACTIVE_MS = 3000
+  // Solange noch kein Raum erkannt wurde, hartnäckig schneller nachfragen:
+  // schnellere Rückmeldung in der UI + mehr WLAN-Traffic vom Handy,
+  // den die ESP-Nodes früher sniffern können.
+  const HEARTBEAT_SEARCH_MS = 1000
   const HEARTBEAT_IDLE_MS = 10000
   const MAC_PATTERN = /^([0-9a-f]{2}[:-]){5}[0-9a-f]{2}$/i
   let heartbeatTimer: any = null
@@ -113,7 +117,9 @@ export function useTracker() {
     }
 
     if (active.value) {
-      heartbeatTimer = setTimeout(heartbeat, HEARTBEAT_ACTIVE_MS)
+      // Solange der Raum noch unbekannt ist, schnellerer Heartbeat
+      const delay = currentRoom.value ? HEARTBEAT_ACTIVE_MS : HEARTBEAT_SEARCH_MS
+      heartbeatTimer = setTimeout(heartbeat, delay)
     }
   }
 
@@ -142,7 +148,8 @@ export function useTracker() {
     active.value = true
     if (keepScreenAwake.value) requestWakeLock()
 
-    heartbeatTimer = setTimeout(heartbeat, HEARTBEAT_ACTIVE_MS)
+    // Ersten Raum-Heartbeat zügig nachholen statt 3s zu warten
+    heartbeatTimer = setTimeout(heartbeat, 500)
   }
 
   async function stop() {

@@ -40,8 +40,11 @@ const float CLAP_RATIO = 4.5f;                // Impuls-Verhältnis zur Hintergr
 const int32_t MIN_CLAP_LEVEL = 250000;        // Empfindlicherer Schwellenwert (Spitzenwert)
 
 // Wi-Fi Polling & Reporting
-const uint32_t POLL_INTERVAL_MS = 5000;
-const uint32_t REPORT_INTERVAL_MS = 2000;
+// Schneller Poll, solange kein aktives Tracking bekannt ist, damit neue Nutzer
+// sofort auf der Watchlist landen (sonst bis zu 5s Verzögerung beim Verbinden).
+const uint32_t POLL_IDLE_MS = 1000;     // kein Tracking aktiv
+const uint32_t POLL_ACTIVE_MS = 5000;   // Tracking läuft, Watchlist stabil
+const uint32_t REPORT_INTERVAL_MS = 1000;
 const size_t MAX_WATCH = 4;
 
 struct Watch {
@@ -63,6 +66,7 @@ bool waitingForSecondClap = false;
 
 uint32_t lastPollMs = 0;
 uint32_t lastReportMs = 0;
+bool trackingKnown = false;
 bool micRunning = false;
 bool sniffing = false;
 
@@ -155,7 +159,9 @@ void onFrame(void* buf, wifi_promiscuous_pkt_type_t type) {
 
 void startSniffing() {
   wifi_promiscuous_filter_t filter;
-  filter.filter_mask = WIFI_PROMIS_FILTER_MASK_DATA;
+  // Auch Management-Frames (z.B. Probe Requests) mitschneiden: Handys im
+  // Stromsparmodus senden sonst evtl. selten Daten-Frames -> lange Suchzeit.
+  filter.filter_mask = WIFI_PROMIS_FILTER_MASK_DATA | WIFI_PROMIS_FILTER_MASK_MGMT;
   esp_wifi_set_promiscuous_filter(&filter);
   esp_wifi_set_promiscuous_rx_cb(&onFrame);
   esp_wifi_set_promiscuous(true);
@@ -244,6 +250,8 @@ void pollServer() {
     if (sniffing) stopSniffing();
     setWatchList(macs, 0);
   }
+
+  trackingKnown = tracking;
 }
 
 void reportRssi() {
@@ -355,7 +363,7 @@ void setup() {
 void loop() {
   uint32_t now = millis();
 
-  if (lastPollMs == 0 || now - lastPollMs >= POLL_INTERVAL_MS) {
+  if (lastPollMs == 0 || now - lastPollMs >= (trackingKnown ? POLL_ACTIVE_MS : POLL_IDLE_MS)) {
     lastPollMs = now;
     pollServer();
   }

@@ -21,6 +21,12 @@
       <template v-else-if="currentRoom">
         Licht folgt dir aktuell im <strong>{{ formatRoomTitle(currentRoom) }}</strong>
       </template>
+      <template v-else-if="!hasMac">
+        Keine WLAN-MAC hinterlegt – in den Einstellungen deine WLAN-MAC eintragen
+      </template>
+      <template v-else-if="signalCount > 0">
+        Signal erkannt ({{ signalCount }} Raum/Räume) – warte auf Bestätigung...
+      </template>
       <template v-else>
         Suche Signal über ESP32-Beacons & Wi-Fi...
       </template>
@@ -55,6 +61,8 @@ const props = defineProps<{
   active: boolean
   currentRoom: string | null
   currentRssi?: number | null
+  hasMac?: boolean
+  signalCount?: number
 }>()
 
 defineEmits<{

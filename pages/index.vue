@@ -5,6 +5,8 @@
       :active="active"
       :current-room="currentRoom"
       :current-rssi="currentRoomRssi"
+      :has-mac="Boolean(mac.trim())"
+      :signal-count="Object.keys(roomSignals).length"
       @toggle="toggleTracking"
     />
 
